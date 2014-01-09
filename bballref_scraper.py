@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from pprint import pprint
 
 missing = list()
+share = list()
 found = list()
 player_list = pd.read_csv('nba_draft.csv')['name'].tolist()
 
@@ -20,10 +21,10 @@ for player in player_list:
 	if not r.history: 
 		if r.text.encode('utf-8').find('0 hits') != -1:
 			print(player+' not found / no college.')
-			missing.append(player + ', NA')
+			share.append([player, 'NA'])
 		else:
 			print(player+' shares name.')
-			missing.append(player + ', SN')
+			missing.append([player, 'SN'])
 	else:
 		soup = BeautifulSoup(r.text)
 		year = [tag.text.encode('utf-8') for tag in soup.find(id='players_totals').find_all('tr')[-2].find_all('td')]
@@ -39,6 +40,10 @@ with open('college_stats.csv','wb') as f:
 with open('missing.csv','wb') as f:
 	writer = csv.writer(f)
 	writer.writerows(missing)
+
+with open('share.csv','wb') as f:
+	writer = csv.writer(f)
+	writer.writerows(share)
 
 
 
